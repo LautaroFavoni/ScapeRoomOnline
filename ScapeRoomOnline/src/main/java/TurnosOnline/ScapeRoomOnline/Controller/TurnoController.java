@@ -23,7 +23,7 @@ public class TurnoController {
     @Autowired
     private SalaRepository salaRepository;
 
-    @PostMapping
+    @PostMapping("crear")
     public ResponseEntity<Turno> createTurno(@RequestBody TurnoForCreation turnoDTO) {
         Optional<Sala> sala = salaRepository.findById(turnoDTO.getSalaId());
         if (sala.isPresent()) {

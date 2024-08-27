@@ -12,7 +12,7 @@ public class Turno {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonIgnore
+
     @ManyToOne
     @JoinColumn(name = "sala_id", nullable = false)
     private Sala sala;

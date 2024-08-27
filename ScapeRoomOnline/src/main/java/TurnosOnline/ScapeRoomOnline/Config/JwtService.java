@@ -17,7 +17,7 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    private final String secretKey = "your-secret-key";
+    private final String secretKey = "pQ1MqycZ7bqZcO3Gx0HDVjNyrI8AmdWCuqPg8T8D+cM=";
     private final long expirationTime = 86400000; // 24 hours in milliseconds
 
     public String generateToken(String username) {
