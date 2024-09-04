@@ -85,27 +85,28 @@
             <scope>runtime</scope>
         </dependency>
 
-    </dependencies>
+	</dependencies>
 
-    <build>
-        <directory>out</directory> <!-- Configura el directorio de salida para el JAR -->
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
-                <configuration>
-                    <archive>
-                        <manifestEntries>
-                            <Main-Class>TurnosOnline/ScapeRoomOnline/ScapeRoomOnlineApplication.java</Main-Class>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+	<build>
+		<directory>${project.basedir}/out</directory>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.2.0</version>
+				<configuration>
+					<outputDirectory>${project.basedir}/out</outputDirectory>
+				</configuration>
+			</plugin>
+
+
+		</plugins>
+	</build>
+
 </project>
