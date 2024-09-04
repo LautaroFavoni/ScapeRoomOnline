@@ -88,6 +88,7 @@
 	</dependencies>
 
 	<build>
+		<directory>${project.basedir}/out</directory>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -95,18 +96,14 @@
 			</plugin>
 
 
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-jar-plugin</artifactId>
-						<version>3.2.0</version>
-						<configuration>
-							<archive>
-								<manifestEntries>
-									<Main-Class>TurnosOnline.ScapeRoomOnline.ScapeRoomOnlineApplication</Main-Class>
-								</manifestEntries>
-							</archive>
-						</configuration>
-					</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.2.0</version>
+				<configuration>
+					<outputDirectory>${project.basedir}/out</outputDirectory>
+				</configuration>
+			</plugin>
 
 
 		</plugins>
