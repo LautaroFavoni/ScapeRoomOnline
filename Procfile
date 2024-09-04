@@ -1,1 +1,1 @@
-web: java -jar out/artifacts/ScapeRoomOnline_jar/ScapeRoomOnline.jar
+web: java -jar target/ScapeRoomOnline-0.0.1-SNAPSHOT.jar

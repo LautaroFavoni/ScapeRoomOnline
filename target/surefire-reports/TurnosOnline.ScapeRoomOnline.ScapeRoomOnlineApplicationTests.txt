@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: TurnosOnline.ScapeRoomOnline.ScapeRoomOnlineApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.377 s -- in TurnosOnline.ScapeRoomOnline.ScapeRoomOnlineApplicationTests
