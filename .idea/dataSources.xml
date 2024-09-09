@@ -15,5 +15,28 @@
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="org.postgresql.Drive" uuid="f1a52046-070a-4251-87c2-46a2b97aa503">
+      <driver-ref>org.postgresql.Drive</driver-ref>
+      <synchronize>true</synchronize>
+      <configured-by-url>true</configured-by-url>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>postgres://udrj9ooigcdr1m:paad5f0e68e94a4b3d23f24ff4147bf2a0b44f3dc3913cbffb5d04d9e4b0c5ae7@c5p86clmevrg5s.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d5ncmmg9vjf6qk</jdbc-url>
+      <jdbc-additional-properties>
+        <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
+      </jdbc-additional-properties>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="d5ncmmg9vjf6qk@c5p86clmevrg5s.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com" uuid="3c0f9a90-8876-4506-860b-a8f900014b4e">
+      <driver-ref>org.postgresql.Drive</driver-ref>
+      <imported>true</imported>
+      <configured-by-url>true</configured-by-url>
+      <remarks>$PROJECT_DIR$/src/main/resources/application.properties</remarks>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://c5p86clmevrg5s.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d5ncmmg9vjf6qk</jdbc-url>
+      <jdbc-additional-properties>
+        <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
+      </jdbc-additional-properties>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
