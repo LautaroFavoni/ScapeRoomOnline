@@ -48,9 +48,10 @@
 
 
         <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.6.0</version> <!-- Asegúrate de usar la versión correcta -->
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.31</version> <!-- Usa la versión que desees o la más reciente -->
+            <scope>runtime</scope>
         </dependency>
 
         <dependency>
