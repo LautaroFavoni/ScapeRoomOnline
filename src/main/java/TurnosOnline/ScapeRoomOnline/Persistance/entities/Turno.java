@@ -2,6 +2,7 @@ package TurnosOnline.ScapeRoomOnline.Persistance.entities;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -32,9 +33,9 @@ public class Turno {
 
     private String pago;
 
-    private Number importePagado;
+    private BigDecimal importePagado;
 
-    public Turno(Sala sala, LocalDateTime diaYHora, String telefono, String nombre, String apellido, String dni, String mail, Number jugadores, Boolean cupon, String pago, Number importePagado) {
+    public Turno(Sala sala, LocalDateTime diaYHora, String telefono, String nombre, String apellido, String dni, String mail, Number jugadores, Boolean cupon, String pago, BigDecimal importePagado) {
         this.sala = sala;
         this.diaYHora = diaYHora;
         this.telefono = telefono;
@@ -140,11 +141,11 @@ public class Turno {
         this.pago = pago;
     }
 
-    public Number getImportePagado() {
+    public BigDecimal getImportePagado() {
         return importePagado;
     }
 
-    public void setImportePagado(Number importePagado) {
+    public void setImportePagado(BigDecimal importePagado) {
         this.importePagado = importePagado;
     }
 }

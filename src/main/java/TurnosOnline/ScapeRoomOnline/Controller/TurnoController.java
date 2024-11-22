@@ -1,17 +1,26 @@
 package TurnosOnline.ScapeRoomOnline.Controller;
 
 
+import TurnosOnline.ScapeRoomOnline.Persistance.DTOs.TurnoConLinkDePago;
 import TurnosOnline.ScapeRoomOnline.Persistance.DTOs.TurnoForCreation;
 import TurnosOnline.ScapeRoomOnline.Persistance.entities.Sala;
 import TurnosOnline.ScapeRoomOnline.Persistance.entities.Turno;
 import TurnosOnline.ScapeRoomOnline.Persistance.repository.SalaRepository;
 import TurnosOnline.ScapeRoomOnline.Persistance.repository.TurnoRepository;
 import TurnosOnline.ScapeRoomOnline.Services.EmailService;
+import com.mercadopago.MercadoPagoConfig;
+import com.mercadopago.client.preference.PreferenceClient;
+import com.mercadopago.client.preference.PreferenceItemRequest;
+import com.mercadopago.client.preference.PreferenceRequest;
+import com.mercadopago.exceptions.MPApiException;
+import com.mercadopago.exceptions.MPException;
+import com.mercadopago.resources.preference.Preference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -28,8 +37,14 @@ public class TurnoController {
     @Autowired
     private EmailService emailService;
 
+
     @PostMapping("crear")
-    public ResponseEntity<Turno> createTurno( @RequestBody TurnoForCreation turnoDTO) {
+    public ResponseEntity<?> createTurno(@RequestBody TurnoForCreation turnoDTO) {
+        // Validar los datos del DTO antes de continuar
+        if (turnoDTO.getImportePagado().compareTo(BigDecimal.ZERO) <= 0) {
+            return new ResponseEntity<>("El importe pagado debe ser mayor que cero", HttpStatus.BAD_REQUEST);
+        }
+
         Optional<Sala> sala = salaRepository.findById(turnoDTO.getSalaId());
         if (sala.isPresent()) {
             // Verificar si ya existe un turno en la misma sala a la misma hora
@@ -49,23 +64,52 @@ public class TurnoController {
             nuevoTurno.setMail(turnoDTO.getMail());
             nuevoTurno.setJugadores(turnoDTO.getJugadores());
             nuevoTurno.setCupon(turnoDTO.getCupon());
-            nuevoTurno.setPago(turnoDTO.getPago());
-            nuevoTurno.setImportePagado(turnoDTO.getImportePagado());
+            nuevoTurno.setPago("false");
 
-            // Guardar el nuevo turno en la base de datos
             Turno savedTurno = turnoRepository.saveAndFlush(nuevoTurno);
 
-            // Enviar correo al usuario
-            String subject = "Confirmación de Turno";
-            String body = "Tu turno ha sido reservado exitosamente para la sala: " + sala.get().getNombre() +
-                    " a las " + turnoDTO.getDiaYHora().toString() + ". ¡Te esperamos!";
-            emailService.sendEmail(turnoDTO.getMail(), subject, body); // Asegúrate de enviar al correo, no al teléfono
+            // Configurar el SDK de Mercado Pago
+            MercadoPagoConfig.setAccessToken(System.getenv("MERCADO_PAGO_ACCESS_TOKEN")); // Mejor usar variable de entorno
 
-            return new ResponseEntity<>(savedTurno, HttpStatus.CREATED);
+            // Crear un ítem para la preferencia
+            PreferenceItemRequest itemRequest = PreferenceItemRequest.builder()
+                    .title("Turno en sala " + sala.get().getNombre())
+                    .quantity(1)
+                    .unitPrice(turnoDTO.getImportePagado()) // Asegúrate de que sea BigDecimal
+                    .build();
+
+            // Crear la preferencia
+            PreferenceRequest preferenceRequest = PreferenceRequest.builder()
+                    .items(List.of(itemRequest))
+                    .build();
+
+            PreferenceClient preferenceClient = new PreferenceClient();
+            try {
+                Preference preference = preferenceClient.create(preferenceRequest);
+                String paymentLink = preference.getSandboxInitPoint(); // Usar getInitPoint() para producción
+
+                // Enviar correo con el enlace de pago
+                String subject = "Confirmación de Turno - Pago Pendiente";
+                String body = "Tu turno ha sido reservado exitosamente para la sala: " + sala.get().getNombre() +
+                        " a las " + turnoDTO.getDiaYHora() + ". Para completar el pago, haz clic en el siguiente enlace: " +
+                        paymentLink;
+                emailService.sendEmail(turnoDTO.getMail(), subject, body);
+
+                // Crear el objeto de respuesta con el turno y el enlace de pago
+                TurnoConLinkDePago response = new TurnoConLinkDePago(savedTurno, paymentLink);
+
+                return new ResponseEntity<>(response, HttpStatus.CREATED);
+
+            } catch (MPException | MPApiException e) {
+                // Manejo de excepciones más limpio
+                e.printStackTrace();
+                return new ResponseEntity<>("Error al procesar el pago con Mercado Pago: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         } else {
             return ResponseEntity.notFound().build(); // Sala no encontrada
         }
     }
+
 
 
 

@@ -11,4 +11,7 @@ public interface TurnoRepository extends JpaRepository <Turno, Long> {
     List<Turno> findByDiaYHoraAfter(LocalDateTime dateTime);
 
     Optional<Turno> findBySalaIdAndDiaYHora(Long salaId, LocalDateTime diaYHora);
+
+
+    Optional<Turno> findByPreferenceId(String preferenceId);
 }
