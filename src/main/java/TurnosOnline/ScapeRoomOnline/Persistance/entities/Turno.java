@@ -31,12 +31,16 @@ public class Turno {
 
     private Boolean cupon;
 
+    private String preferenceId;
+
     private String pago;
 
-    private BigDecimal importePagado;
 
-    public Turno(Sala sala, LocalDateTime diaYHora, String telefono, String nombre, String apellido, String dni, String mail, Number jugadores, Boolean cupon, String pago, BigDecimal importePagado) {
+    private BigDecimal importeTotal;
+
+    public Turno(Sala sala, String preferenceId, LocalDateTime diaYHora, String telefono, String nombre, String apellido, String dni, String mail, Number jugadores, Boolean cupon, String pago, BigDecimal importeTotal) {
         this.sala = sala;
+        this.preferenceId = preferenceId;
         this.diaYHora = diaYHora;
         this.telefono = telefono;
         this.nombre = nombre;
@@ -46,7 +50,7 @@ public class Turno {
         this.jugadores = jugadores;
         this.cupon = cupon;
         this.pago = pago;
-        this.importePagado = importePagado;
+        this.importeTotal = importeTotal;
     }
 
     public Turno() {
@@ -67,6 +71,14 @@ public class Turno {
 
     public void setSala(Sala sala) {
         this.sala = sala;
+    }
+
+    public String getPreferenceId() {
+        return preferenceId;
+    }
+
+    public void setPreferenceId(String preferenceId) {
+        this.preferenceId = preferenceId;
     }
 
     public LocalDateTime getDiaYHora() {
@@ -141,11 +153,11 @@ public class Turno {
         this.pago = pago;
     }
 
-    public BigDecimal getImportePagado() {
-        return importePagado;
+    public BigDecimal getimporteTotal() {
+        return importeTotal;
     }
 
-    public void setImportePagado(BigDecimal importePagado) {
-        this.importePagado = importePagado;
+    public void setimporteTotal(BigDecimal importeTotal) {
+        this.importeTotal = importeTotal;
     }
 }

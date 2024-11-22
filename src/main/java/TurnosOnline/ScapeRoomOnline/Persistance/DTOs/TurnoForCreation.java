@@ -15,13 +15,13 @@ public class TurnoForCreation {
     private Number jugadores;
     private Boolean cupon;
     private String pago;
-    private BigDecimal importePagado;
+    private BigDecimal importeTotal;
 
     // Constructores
     public TurnoForCreation() {
     }
 
-    public TurnoForCreation(Long salaId, LocalDateTime diaYHora, String telefono, String nombre, String apellido, String dni, String mail, Number jugadores, Boolean cupon, String pago, BigDecimal importePagado) {
+    public TurnoForCreation(Long salaId, LocalDateTime diaYHora, String telefono, String nombre, String apellido, String dni, String mail, Number jugadores, Boolean cupon, String pago, BigDecimal importeTotal) {
         this.salaId = salaId;
         this.diaYHora = diaYHora;
         this.telefono = telefono;
@@ -32,7 +32,7 @@ public class TurnoForCreation {
         this.jugadores = jugadores;
         this.cupon = cupon;
         this.pago = pago;
-        this.importePagado = importePagado;
+        this.importeTotal = importeTotal;
     }
 
     // Getters y Setters
@@ -116,11 +116,11 @@ public class TurnoForCreation {
         this.pago = pago;
     }
 
-    public BigDecimal getImportePagado() {
-        return (BigDecimal) importePagado;
+    public BigDecimal getimporteTotal() {
+        return (BigDecimal) importeTotal;
     }
 
-    public void setImportePagado(BigDecimal importePagado) {
-        this.importePagado = importePagado;
+    public void setimporteTotal(BigDecimal importeTotal) {
+        this.importeTotal = importeTotal;
     }
 }
