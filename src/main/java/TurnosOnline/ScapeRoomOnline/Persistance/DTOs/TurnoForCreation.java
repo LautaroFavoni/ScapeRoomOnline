@@ -1,5 +1,6 @@
 package TurnosOnline.ScapeRoomOnline.Persistance.DTOs;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class TurnoForCreation {
@@ -14,13 +15,13 @@ public class TurnoForCreation {
     private Number jugadores;
     private Boolean cupon;
     private String pago;
-    private Number importePagado;
+    private BigDecimal importePagado;
 
     // Constructores
     public TurnoForCreation() {
     }
 
-    public TurnoForCreation(Long salaId, LocalDateTime diaYHora, String telefono, String nombre, String apellido, String dni, String mail, Number jugadores, Boolean cupon, String pago, Number importePagado) {
+    public TurnoForCreation(Long salaId, LocalDateTime diaYHora, String telefono, String nombre, String apellido, String dni, String mail, Number jugadores, Boolean cupon, String pago, BigDecimal importePagado) {
         this.salaId = salaId;
         this.diaYHora = diaYHora;
         this.telefono = telefono;
@@ -115,11 +116,11 @@ public class TurnoForCreation {
         this.pago = pago;
     }
 
-    public Number getImportePagado() {
-        return importePagado;
+    public BigDecimal getImportePagado() {
+        return (BigDecimal) importePagado;
     }
 
-    public void setImportePagado(Number importePagado) {
+    public void setImportePagado(BigDecimal importePagado) {
         this.importePagado = importePagado;
     }
 }
