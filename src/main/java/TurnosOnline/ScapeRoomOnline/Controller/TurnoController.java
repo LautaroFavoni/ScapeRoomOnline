@@ -37,11 +37,10 @@ public class TurnoController {
     @Autowired
     private EmailService emailService;
 
-
     @PostMapping("crear")
     public ResponseEntity<?> createTurno(@RequestBody TurnoForCreation turnoDTO) {
         // Validar los datos del DTO antes de continuar
-        if (turnoDTO.getImportePagado().compareTo(BigDecimal.ZERO) <= 0) {
+        if (turnoDTO.getimporteTotal().compareTo(BigDecimal.ZERO) <= 0) {
             return new ResponseEntity<>("El importe pagado debe ser mayor que cero", HttpStatus.BAD_REQUEST);
         }
 
@@ -75,7 +74,7 @@ public class TurnoController {
             PreferenceItemRequest itemRequest = PreferenceItemRequest.builder()
                     .title("Turno en sala " + sala.get().getNombre())
                     .quantity(1)
-                    .unitPrice(turnoDTO.getImportePagado()) // Asegúrate de que sea BigDecimal
+                    .unitPrice(turnoDTO.getimporteTotal()) // Asegúrate de que sea BigDecimal
                     .build();
 
             // Crear la preferencia
@@ -87,6 +86,10 @@ public class TurnoController {
             try {
                 Preference preference = preferenceClient.create(preferenceRequest);
                 String paymentLink = preference.getSandboxInitPoint(); // Usar getInitPoint() para producción
+
+                // Guardar el preferenceId en el turno y actualizar en la base de datos
+                savedTurno.setPreferenceId(preference.getId());
+                turnoRepository.save(savedTurno);
 
                 // Enviar correo con el enlace de pago
                 String subject = "Confirmación de Turno - Pago Pendiente";
@@ -109,6 +112,7 @@ public class TurnoController {
             return ResponseEntity.notFound().build(); // Sala no encontrada
         }
     }
+
 
 
 
