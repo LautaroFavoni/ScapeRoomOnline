@@ -63,12 +63,13 @@ public class TurnoController {
             nuevoTurno.setMail(turnoDTO.getMail());
             nuevoTurno.setJugadores(turnoDTO.getJugadores());
             nuevoTurno.setCupon(turnoDTO.getCupon());
+            nuevoTurno.setimporteTotal(turnoDTO.getimporteTotal());
             nuevoTurno.setPago("false");
 
             Turno savedTurno = turnoRepository.saveAndFlush(nuevoTurno);
 
             // Configurar el SDK de Mercado Pago
-            MercadoPagoConfig.setAccessToken(System.getenv("APP_USR-3963746540724282-112213-dc5dcef92764c0c37bb055ecfaf1993f-2113837918")); // Mejor usar variable de entorno
+            MercadoPagoConfig.setAccessToken("APP_USR-3963746540724282-112213-dc5dcef92764c0c37bb055ecfaf1993f-2113837918"); // Mejor usar variable de entorno
 
             // Crear un ítem para la preferencia
             PreferenceItemRequest itemRequest = PreferenceItemRequest.builder()
