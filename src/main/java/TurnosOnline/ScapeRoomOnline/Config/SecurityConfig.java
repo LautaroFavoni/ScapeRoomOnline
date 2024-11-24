@@ -27,7 +27,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeRequests(authz -> authz
-                        .requestMatchers("/register", "/login", "/public/api/turnos/crear","/api/mercadopago/**").permitAll()
+                        .requestMatchers("/register", "/login", "/public/api/turnos/crear","/api/mercadopago/webhook").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
