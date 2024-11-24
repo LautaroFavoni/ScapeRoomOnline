@@ -69,7 +69,7 @@ public class TurnoController {
             Turno savedTurno = turnoRepository.saveAndFlush(nuevoTurno);
 
             // Configurar el SDK de Mercado Pago
-            MercadoPagoConfig.setAccessToken("APP_USR-3963746540724282-112213-dc5dcef92764c0c37bb055ecfaf1993f-2113837918"); // Mejor usar variable de entorno
+            MercadoPagoConfig.setAccessToken("APP_USR-1593157515372911-112213-2494993db59cc5afd3d80634ce2641ee-264117743"); // Mejor usar variable de entorno
 
             // Crear un ítem para la preferencia
             PreferenceItemRequest itemRequest = PreferenceItemRequest.builder()
