@@ -9,10 +9,9 @@ import com.mercadopago.client.payment.PaymentClient;
 import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
 import com.mercadopago.resources.payment.Payment;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,15 +22,13 @@ import java.util.Optional;
 @RequestMapping("api/mercadopago")
 public class MercadoPagoWebhookController {
 
-    private static final Logger logger = (Logger) LoggerFactory.getLogger(MercadoPagoWebhookController.class);
+    private static final Logger logger = LoggerFactory.getLogger(MercadoPagoWebhookController.class);
 
     @Autowired
     private TurnoRepository turnoRepository;
 
-    @Value("${mercadopago.access-token}")
-    private String accessToken;
-
     public MercadoPagoWebhookController() {
+        String accessToken = "APP_USR-3963746540724282-112213-dc5dcef92764c0c37bb055ecfaf1993f-2113837918";
         MercadoPagoConfig.setAccessToken(accessToken);
     }
 
