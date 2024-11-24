@@ -86,7 +86,7 @@ public class TurnoController {
             PreferenceClient preferenceClient = new PreferenceClient();
             try {
                 Preference preference = preferenceClient.create(preferenceRequest);
-                String paymentLink = preference.getSandboxInitPoint(); // Usar getInitPoint() para producción
+                String paymentLink = preference.getInitPoint(); // Usar getInitPoint() para producción
 
                 // Guardar el preferenceId en el turno y actualizar en la base de datos
                 savedTurno.setPreferenceId(preference.getId());
