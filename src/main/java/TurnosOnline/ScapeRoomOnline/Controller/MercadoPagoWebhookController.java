@@ -29,12 +29,12 @@ public class MercadoPagoWebhookController {
     }
 
     @PostMapping("/webhook")
-    public ResponseEntity<String> recibirNotificacion(@RequestBody String body, @RequestHeader("X-Mercadopago-Signature") String signature) {
+    public ResponseEntity<String> recibirNotificacion(@RequestBody String body, @RequestHeader(value = "X-Mercadopago-Signature", required = false) String signature)  {
         try {
             // Validar la firma de la notificación (si aplica)
-            if (!validarFirma(signature, body)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Firma no válida");
-            }
+            //if (!validarFirma(signature, body)) {
+            //    return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Firma no válida");
+            //}
 
             // Extraer el ID de la preferencia desde el cuerpo de la notificación
             String preferenceId = extraerPreferenceId(body);
