@@ -64,10 +64,9 @@ public class MercadoPagoWebhookController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pago no encontrado en Mercado Pago");
             }
 
-            // Obtener el preferenceId del pago
-            String preferenceId = payment.getExternalReference();  // Notar los paréntesis
+            // Obtener el externalReference del pago (es el preferenceId o ID de referencia que buscas)
+            String preferenceId = payment.getExternalReference();
             logger.info("Preference ID asociado al pago: {}", preferenceId);
-
 
             // Actualizar el estado del turno en la base de datos
             String estado = payment.getStatus();
@@ -99,6 +98,7 @@ public class MercadoPagoWebhookController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al procesar la notificación");
         }
     }
+
 
     private String extraerPaymentId(String body) {
         try {
