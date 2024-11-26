@@ -2,6 +2,7 @@ package TurnosOnline.ScapeRoomOnline.Controller;
 
 import TurnosOnline.ScapeRoomOnline.Persistance.entities.Turno;
 import TurnosOnline.ScapeRoomOnline.Persistance.repository.TurnoRepository;
+import TurnosOnline.ScapeRoomOnline.Services.EmailService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mercadopago.MercadoPagoConfig;
@@ -26,6 +27,9 @@ public class MercadoPagoWebhookController {
 
     @Autowired
     private TurnoRepository turnoRepository;
+
+    @Autowired
+    private EmailService emailService;  // Inyectamos el servicio de correo
 
     public MercadoPagoWebhookController() {
         String accessToken = "APP_USR-1593157515372911-112213-2494993db59cc5afd3d80634ce2641ee-264117743";
@@ -64,9 +68,18 @@ public class MercadoPagoWebhookController {
             Optional<Turno> turnoOpt = turnoRepository.findByPreferenceId(paymentId);
             if (turnoOpt.isPresent()) {
                 Turno turno = turnoOpt.get();
-                turno.setPago(String.valueOf("approved".equals(estado)));
+                turno.setPago("approved".equals(estado) ? "true" : "false");
                 turnoRepository.save(turno);
                 logger.info("Turno actualizado correctamente para el pago con ID: {}", paymentId);
+
+                // Si el pago fue aprobado, enviar un correo de confirmación
+                if ("approved".equals(estado)) {
+                    String subject = "Confirmación de pago de tu turno";
+                    String bodyMessage = "El pago de tu turno ha sido procesado con éxito. ¡Gracias por reservar con nosotros!";
+                    emailService.sendEmail(turno.getMail(), subject, bodyMessage);
+                    logger.info("Correo de confirmación enviado a: {}", turno.getMail());
+                }
+
                 return ResponseEntity.ok("Pago procesado y turno actualizado");
             } else {
                 logger.warn("No se encontró un turno asociado al pago con ID: {}", paymentId);
