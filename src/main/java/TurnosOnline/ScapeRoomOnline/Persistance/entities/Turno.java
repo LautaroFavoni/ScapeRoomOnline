@@ -36,6 +36,9 @@ public class Turno {
     private String pago;
 
 
+
+    private String dataId;
+
     private BigDecimal importeTotal;
 
     public Turno(Sala sala, String preferenceId, LocalDateTime diaYHora, String telefono, String nombre, String apellido, String dni, String mail, Number jugadores, Boolean cupon, String pago, BigDecimal importeTotal) {
@@ -160,4 +163,13 @@ public class Turno {
     public void setimporteTotal(BigDecimal importeTotal) {
         this.importeTotal = importeTotal;
     }
+
+    public String getDataId() {
+        return dataId;
+    }
+
+    public void setDataId(String dataId) {
+        this.dataId = dataId;
+    }
+
 }

@@ -10,6 +10,7 @@ import com.mercadopago.client.payment.PaymentClient;
 import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
 import com.mercadopago.resources.payment.Payment;
+import com.mercadopago.resources.preference.Preference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,12 +64,20 @@ public class MercadoPagoWebhookController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pago no encontrado en Mercado Pago");
             }
 
+            // Obtener el preferenceId del pago
+            String preferenceId = payment.getExternalReference();  // Notar los paréntesis
+            logger.info("Preference ID asociado al pago: {}", preferenceId);
+
+
             // Actualizar el estado del turno en la base de datos
             String estado = payment.getStatus();
-            Optional<Turno> turnoOpt = turnoRepository.findByPreferenceId(paymentId);
+            Optional<Turno> turnoOpt = turnoRepository.findByPreferenceId(preferenceId);
             if (turnoOpt.isPresent()) {
                 Turno turno = turnoOpt.get();
                 turno.setPago("approved".equals(estado) ? "true" : "false");
+
+                // Guardar el dataId de la transacción en el turno
+                turno.setDataId(payment.getId().toString()); // Usamos el ID del pago (dataId)
                 turnoRepository.save(turno);
                 logger.info("Turno actualizado correctamente para el pago con ID: {}", paymentId);
 
