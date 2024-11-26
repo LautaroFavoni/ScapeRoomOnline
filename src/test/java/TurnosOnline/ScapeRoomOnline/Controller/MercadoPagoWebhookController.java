@@ -2,6 +2,7 @@ package TurnosOnline.ScapeRoomOnline.Controller;
 
 import TurnosOnline.ScapeRoomOnline.Persistance.entities.Turno;
 import TurnosOnline.ScapeRoomOnline.Persistance.repository.TurnoRepository;
+import TurnosOnline.ScapeRoomOnline.Services.EmailService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mercadopago.MercadoPagoConfig;
@@ -27,6 +28,9 @@ public class MercadoPagoWebhookController {
     @Autowired
     private TurnoRepository turnoRepository;
 
+    @Autowired
+    private EmailService emailService;
+
     public MercadoPagoWebhookController() {
         String accessToken = "APP_USR-1593157515372911-112213-2494993db59cc5afd3d80634ce2641ee-264117743";
         MercadoPagoConfig.setAccessToken(accessToken);
@@ -38,36 +42,45 @@ public class MercadoPagoWebhookController {
             @RequestBody(required = false) String body,
             @RequestHeader(value = "X-Mercadopago-Signature", required = false) String signature) {
         try {
-            // Validar si se recibió el ID desde el query string
             String paymentId = queryDataId;
 
-            // Si no se recibió el ID en la query, intentar extraerlo del cuerpo JSON
+            // Extraer el ID de pago del cuerpo JSON si no viene en el query
             if (paymentId == null && body != null) {
                 paymentId = extraerPaymentId(body);
             }
 
-            // Validar que se obtuvo un ID de pago válido
             if (paymentId == null) {
                 logger.error("No se pudo obtener el ID de pago de la solicitud");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID de pago no encontrado en la solicitud");
             }
 
-            // Consultar el estado del pago en Mercado Pago
             Payment payment = consultarEstadoPago(paymentId);
             if (payment == null) {
                 logger.error("No se encontró el pago en Mercado Pago con ID: {}", paymentId);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pago no encontrado en Mercado Pago");
             }
 
-            // Actualizar el estado del turno en la base de datos
             String estado = payment.getStatus();
             Optional<Turno> turnoOpt = turnoRepository.findByPreferenceId(paymentId);
             if (turnoOpt.isPresent()) {
                 Turno turno = turnoOpt.get();
-                turno.setPago(String.valueOf("approved".equals(estado)));
-                turnoRepository.save(turno);
-                logger.info("Turno actualizado correctamente para el pago con ID: {}", paymentId);
-                return ResponseEntity.ok("Pago procesado y turno actualizado");
+
+                if ("approved".equals(estado)) {
+                    turno.setPago("true");
+                    turnoRepository.save(turno);
+
+                    // Enviar correo de confirmación
+                    String subject = "Turno Confirmado - Pago Recibido";
+                    String bodyEmail = "Tu turno ha sido confirmado exitosamente para la sala: " + turno.getSala().getNombre() +
+                            " a las " + turno.getDiaYHora() + ". ¡Gracias por tu pago!";
+                    emailService.sendEmail(turno.getMail(), subject, bodyEmail);
+
+                    logger.info("Turno actualizado y correo enviado para el pago con ID: {}", paymentId);
+                    return ResponseEntity.ok("Pago procesado, turno confirmado y correo enviado");
+                } else {
+                    logger.info("Pago no aprobado. Estado actual: {}", estado);
+                    return ResponseEntity.ok("Pago no aprobado. Estado: " + estado);
+                }
             } else {
                 logger.warn("No se encontró un turno asociado al pago con ID: {}", paymentId);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Turno asociado no encontrado");
@@ -78,24 +91,20 @@ public class MercadoPagoWebhookController {
         }
     }
 
-    private String extraerPaymentId(String body) {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode jsonNode = mapper.readTree(body);
-            return jsonNode.path("data").path("id").asText(null);
-        } catch (Exception e) {
-            logger.error("Error al extraer el ID del pago del cuerpo JSON: ", e);
-            return null;
-        }
-    }
-
     private Payment consultarEstadoPago(String paymentId) {
         try {
             PaymentClient paymentClient = new PaymentClient();
-            return paymentClient.get(Long.valueOf(paymentId));
+            Long id = Long.parseLong(paymentId);
+            return paymentClient.get(id); // Obtiene el objeto Payment desde el SDK
         } catch (MPException | MPApiException e) {
-            logger.error("Error al consultar el estado del pago con ID: {}", paymentId, e);
-            return null;
+            e.printStackTrace();
+            return null; // Manejo básico de errores
         }
+
+
     }
+
+    
+
+
 }
