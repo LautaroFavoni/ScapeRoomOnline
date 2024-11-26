@@ -16,12 +16,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.json.JSONObject;
+
 
 import java.util.Optional;
 
 @RestController
 @RequestMapping("api/mercadopago")
 public class MercadoPagoWebhookController {
+    public String extraerPaymentId(String body) {
+        try {
+            JSONObject json = new JSONObject(body); // Usa org.json para parsear el JSON
+            return json.optString("id", null); // Devuelve el ID si existe
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null; // Manejo básico de errores
+        }
+    }
+
+
 
     private static final Logger logger = LoggerFactory.getLogger(MercadoPagoWebhookController.class);
 
@@ -91,7 +104,7 @@ public class MercadoPagoWebhookController {
         }
     }
 
-    private Payment consultarEstadoPago(String paymentId) {
+    public Payment consultarEstadoPago(String paymentId) {
         try {
             PaymentClient paymentClient = new PaymentClient();
             Long id = Long.parseLong(paymentId);
@@ -104,7 +117,7 @@ public class MercadoPagoWebhookController {
 
     }
 
-    
+
 
 
 }
