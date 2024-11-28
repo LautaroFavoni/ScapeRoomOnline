@@ -65,12 +65,12 @@ public class MercadoPagoWebhookController {
             }
 
             // Obtener el externalReference del pago (es el preferenceId o ID de referencia que buscas)
-            String preferenceId = payment.getExternalReference();
+            Long preferenceId = Long.valueOf(payment.getExternalReference());
             logger.info("Preference ID asociado al pago: {}", preferenceId);
 
             // Actualizar el estado del turno en la base de datos
             String estado = payment.getStatus();
-            Optional<Turno> turnoOpt = turnoRepository.findByPreferenceId(preferenceId);
+            Optional<Turno> turnoOpt = turnoRepository.findById(preferenceId);
             if (turnoOpt.isPresent()) {
                 Turno turno = turnoOpt.get();
                 turno.setPago("approved".equals(estado) ? "true" : "false");

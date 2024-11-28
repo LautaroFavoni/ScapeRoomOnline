@@ -75,12 +75,14 @@ public class TurnoController {
             PreferenceItemRequest itemRequest = PreferenceItemRequest.builder()
                     .title("Turno en sala " + sala.get().getNombre())
                     .quantity(1)
+
                     .unitPrice(turnoDTO.getimporteTotal()) // Asegúrate de que sea BigDecimal
                     .build();
 
             // Crear la preferencia
             PreferenceRequest preferenceRequest = PreferenceRequest.builder()
                     .items(List.of(itemRequest))
+                    .externalReference(String.valueOf(savedTurno.getId()))
                     .build();
 
             PreferenceClient preferenceClient = new PreferenceClient();
