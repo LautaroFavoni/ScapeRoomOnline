@@ -48,8 +48,8 @@ public class TurnoController {
         if (sala.isPresent()) {
             // Verificar si ya existe un turno en la misma sala a la misma hora
             Optional<Turno> turnoExistente = turnoRepository.findBySalaIdAndDiaYHora(turnoDTO.getSalaId(), turnoDTO.getDiaYHora());
-            if (turnoExistente.isPresent()) {
-                return new ResponseEntity<>(HttpStatus.CONFLICT); // Conflicto si ya existe un turno
+            if (turnoExistente.isPresent() && turnoExistente.get().getPago().equalsIgnoreCase("true")) {
+                return new ResponseEntity<>("Ya existe un turno reservado y pagado para esta sala a la misma hora", HttpStatus.CONFLICT);
             }
 
             // Crear el nuevo turno
@@ -59,7 +59,6 @@ public class TurnoController {
             nuevoTurno.setTelefono(turnoDTO.getTelefono());
             nuevoTurno.setNombre(turnoDTO.getNombre());
             nuevoTurno.setApellido(turnoDTO.getApellido());
-            nuevoTurno.setdni(turnoDTO.getdni());
             nuevoTurno.setMail(turnoDTO.getMail());
             nuevoTurno.setJugadores(turnoDTO.getJugadores());
             nuevoTurno.setCupon(turnoDTO.getCupon());

@@ -10,7 +10,7 @@ public class TurnoForCreation {
     private String telefono;
     private String nombre;
     private String apellido;
-    private String dni;
+
     private String mail;
     private Number jugadores;
     private Boolean cupon;
@@ -21,13 +21,12 @@ public class TurnoForCreation {
     public TurnoForCreation() {
     }
 
-    public TurnoForCreation(Long salaId, LocalDateTime diaYHora, String telefono, String nombre, String apellido, String dni, String mail, Number jugadores, Boolean cupon, String pago, BigDecimal importeTotal) {
+    public TurnoForCreation(Long salaId, LocalDateTime diaYHora, String telefono, String nombre, String apellido,  String mail, Number jugadores, Boolean cupon, String pago, BigDecimal importeTotal) {
         this.salaId = salaId;
         this.diaYHora = diaYHora;
         this.telefono = telefono;
         this.nombre = nombre;
         this.apellido = apellido;
-        this.dni = dni;
         this.mail = mail;
         this.jugadores = jugadores;
         this.cupon = cupon;
@@ -76,13 +75,6 @@ public class TurnoForCreation {
         this.apellido = apellido;
     }
 
-    public String getdni() {
-        return dni;
-    }
-
-    public void setdni(String dni) {
-        this.dni = dni;
-    }
 
     public String getMail() {
         return mail;
