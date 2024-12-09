@@ -194,8 +194,8 @@ public class TurnoController {
 
     @GetMapping("/today")
     public List<Turno> getTurnosFromToday() {
-        LocalDateTime today = LocalDateTime.now();
-        return turnoRepository.findByDiaYHoraAfter(today);
+        LocalDateTime todayStart = LocalDateTime.now().toLocalDate().atStartOfDay(); // Obtiene la medianoche de hoy
+        return turnoRepository.findByDiaYHoraAfter(todayStart);
     }
     @GetMapping("/all")
     public List<Turno> getAllTurnos() {
