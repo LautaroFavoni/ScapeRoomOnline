@@ -23,6 +23,16 @@ public class Turno {
 
     private String apellido;
 
+    public Boolean getAsistio() {
+        return asistio;
+    }
+
+    public void setAsistio(Boolean asistio) {
+        this.asistio = asistio;
+    }
+
+    private Boolean asistio;
+
 
 
     private String mail;
@@ -41,14 +51,14 @@ public class Turno {
 
     private BigDecimal importeTotal;
 
-    public Turno(Sala sala, String preferenceId, LocalDateTime diaYHora, String telefono, String nombre, String apellido, String mail, Number jugadores, Boolean cupon, String pago, BigDecimal importeTotal) {
+    public Turno(Sala sala, Boolean asistio ,String preferenceId, LocalDateTime diaYHora, String telefono, String nombre, String apellido, String mail, Number jugadores, Boolean cupon, String pago, BigDecimal importeTotal) {
         this.sala = sala;
         this.preferenceId = preferenceId;
         this.diaYHora = diaYHora;
         this.telefono = telefono;
         this.nombre = nombre;
         this.apellido = apellido;
-
+        this.asistio = asistio;
         this.mail = mail;
         this.jugadores = jugadores;
         this.cupon = cupon;

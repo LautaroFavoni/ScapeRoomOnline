@@ -28,6 +28,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
+import static org.hamcrest.Matchers.not;
+
 @RestController
 @RequestMapping("public/api/turnos")
 public class TurnoController {
@@ -72,6 +74,7 @@ public class TurnoController {
             nuevoTurno.setCupon(turnoDTO.getCupon());
             nuevoTurno.setimporteTotal(turnoDTO.getimporteTotal());
             nuevoTurno.setPago("false");
+            nuevoTurno.setAsistio(false);
 
             Turno savedTurno = turnoRepository.saveAndFlush(nuevoTurno);
 
@@ -87,7 +90,7 @@ public class TurnoController {
                     .build();
 
             // Calcular la fecha y hora de expiración (15 minutos a partir de ahora)
-            LocalDateTime expirationDate = LocalDateTime.now(ZoneOffset.UTC).plusMinutes(15);
+            LocalDateTime expirationDate = LocalDateTime.now(ZoneOffset.UTC).plusMinutes(10);
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
             String expirationDateTo = expirationDate.format(formatter);
 
@@ -201,4 +204,68 @@ public class TurnoController {
     public List<Turno> getAllTurnos() {
         return turnoRepository.findAll();
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateTurno(@PathVariable Long id, @RequestBody TurnoForCreation updatedTurnoDTO) {
+        // Buscar el turno existente por ID
+        Optional<Turno> turnoOptional = turnoRepository.findById(id);
+
+        if (turnoOptional.isEmpty()) {
+            return new ResponseEntity<>("Turno no encontrado", HttpStatus.NOT_FOUND);
+        }
+
+        Turno existingTurno = turnoOptional.get();
+
+        // Verificar si la sala existe
+        Optional<Sala> salaOptional = salaRepository.findById(updatedTurnoDTO.getSalaId());
+        if (salaOptional.isEmpty()) {
+            return new ResponseEntity<>("Sala no encontrada", HttpStatus.NOT_FOUND);
+        }
+
+        Sala sala = salaOptional.get();
+
+
+        // Validar si la sala ha cambiado
+        if (!existingTurno.getSala().getId().equals(updatedTurnoDTO.getSalaId())) {
+            List<Turno> conflictingTurnos = turnoRepository.findPaidTurnosBySalaIdAndDiaYHora(updatedTurnoDTO.getSalaId(), updatedTurnoDTO.getDiaYHora());
+            if (!conflictingTurnos.isEmpty() && !conflictingTurnos.get(0).getId().equals(id)) {
+                return new ResponseEntity<>("Ya existe un turno reservado y pagado para esta sala a la misma hora", HttpStatus.CONFLICT);
+            }
+
+            // Actualizar la sala
+            Optional<Sala> nuevaSala = salaRepository.findById(updatedTurnoDTO.getSalaId());
+            if (nuevaSala.isEmpty()) {
+                return new ResponseEntity<>("Sala no encontrada", HttpStatus.NOT_FOUND);
+            }
+            existingTurno.setSala(nuevaSala.get());
+        }
+
+        // Validar si la hora del turno ha cambiado
+        if (!existingTurno.getDiaYHora().equals(updatedTurnoDTO.getDiaYHora())) {
+            List<Turno> conflictingTurnos = turnoRepository.findPaidTurnosBySalaIdAndDiaYHora(updatedTurnoDTO.getSalaId(), updatedTurnoDTO.getDiaYHora());
+            if (!conflictingTurnos.isEmpty() && !conflictingTurnos.get(0).getId().equals(id)) {
+                return new ResponseEntity<>("Ya existe un turno reservado y pagado para esta sala a la misma hora", HttpStatus.CONFLICT);
+            }
+
+            // Actualizar la hora
+            existingTurno.setDiaYHora(updatedTurnoDTO.getDiaYHora());
+        }
+
+        // Actualizar los valores del turno existente
+        existingTurno.setTelefono(updatedTurnoDTO.getTelefono());
+        existingTurno.setNombre(updatedTurnoDTO.getNombre());
+        existingTurno.setApellido(updatedTurnoDTO.getApellido());
+        existingTurno.setMail(updatedTurnoDTO.getMail());
+        existingTurno.setJugadores(updatedTurnoDTO.getJugadores());
+        existingTurno.setCupon(updatedTurnoDTO.getCupon());
+        existingTurno.setimporteTotal(updatedTurnoDTO.getimporteTotal());
+        existingTurno.setAsistio(updatedTurnoDTO.getAsistio());
+        existingTurno.setPago(updatedTurnoDTO.getPago());
+
+        // Guardar los cambios en la base de datos
+        Turno updatedTurno = turnoRepository.save(existingTurno);
+
+        return new ResponseEntity<>(updatedTurno, HttpStatus.OK);
+    }
+
 }

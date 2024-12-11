@@ -17,12 +17,23 @@ public class TurnoForCreation {
     private String pago;
     private BigDecimal importeTotal;
 
+    private boolean asistio;
+
+    public Boolean getAsistio() {
+        return asistio;
+    }
+
+    public void setAsistio(Boolean asistio) {
+        this.asistio = asistio;
+    }
+
     // Constructores
     public TurnoForCreation() {
     }
 
-    public TurnoForCreation(Long salaId, LocalDateTime diaYHora, String telefono, String nombre, String apellido,  String mail, Number jugadores, Boolean cupon, String pago, BigDecimal importeTotal) {
+    public TurnoForCreation(Long salaId, Boolean asistio,LocalDateTime diaYHora, String telefono, String nombre, String apellido,  String mail, Number jugadores, Boolean cupon, String pago, BigDecimal importeTotal) {
         this.salaId = salaId;
+        this.asistio = asistio;
         this.diaYHora = diaYHora;
         this.telefono = telefono;
         this.nombre = nombre;
