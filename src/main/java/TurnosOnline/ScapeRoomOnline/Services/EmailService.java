@@ -18,17 +18,28 @@ public class EmailService {
 
     public void sendEmail(String to, String subject, String text) {
         try {
+            // Crear el mensaje MIME
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
+
+            // Establecer el remitente explícitamente
+            messageHelper.setFrom("contacto@lockandkey.com.ar");  // Aquí estableces el remitente
+
+            // Establecer el destinatario, el asunto y el contenido
             messageHelper.setTo(to);
             messageHelper.setSubject(subject);
             messageHelper.setText(text, true);  // El segundo parámetro indica que es HTML
 
+            // Enviar el correo
             javaMailSender.send(mimeMessage);
             System.out.println("Correo enviado correctamente a " + to);
         } catch (MailException | MessagingException e) {
             e.printStackTrace();
             System.out.println("Error al enviar el correo a " + to);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error inesperado al enviar el correo a " + to);
         }
     }
+
 }

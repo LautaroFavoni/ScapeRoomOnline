@@ -14,6 +14,7 @@ import com.mercadopago.resources.preference.Preference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,8 +33,10 @@ public class MercadoPagoWebhookController {
     @Autowired
     private EmailService emailService;  // Inyectamos el servicio de correo
 
+    @Value("APP_USR-6994450906540579-121619-7cba43b016b031f3f6c2082781149ee1-2027426021")
+    private String accessToken;
+
     public MercadoPagoWebhookController() {
-        String accessToken = "APP_USR-1593157515372911-112213-2494993db59cc5afd3d80634ce2641ee-264117743";
         MercadoPagoConfig.setAccessToken(accessToken);
     }
 
@@ -43,12 +46,17 @@ public class MercadoPagoWebhookController {
             @RequestBody(required = false) String body,
             @RequestHeader(value = "X-Mercadopago-Signature", required = false) String signature) {
         try {
+            logger.info("Recibida notificación con Signature: {}", signature);
+            logger.info("Query parameter data.id: {}", queryDataId);
+            logger.info("Cuerpo del mensaje recibido: {}", body);
+
             // Validar si se recibió el ID desde el query string
             String paymentId = queryDataId;
 
             // Si no se recibió el ID en la query, intentar extraerlo del cuerpo JSON
             if (paymentId == null && body != null) {
                 paymentId = extraerPaymentId(body);
+                logger.info("Payment ID extraído del cuerpo JSON: {}", paymentId);
             }
 
             // Validar que se obtuvo un ID de pago válido
@@ -83,7 +91,36 @@ public class MercadoPagoWebhookController {
                 // Si el pago fue aprobado, enviar un correo de confirmación
                 if ("approved".equals(estado)) {
                     String subject = "Confirmación de pago de tu turno";
-                    String bodyMessage = "El pago de tu turno ha sido procesado con éxito. ¡Gracias por reservar con nosotros!";
+                    String bodyMessage = """
+<html>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+            <!-- Título -->
+            <h1 style="text-align: center; color: #ff7e00;">¡Pago confirmado!</h1>
+            <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;">
+            <!-- Introducción -->
+            <p><strong>Tu número de reserva es</strong>: %s </p>
+            <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;">
+            <p>¡Nos alegra mucho anunciarte que tu pago ha sido confirmado! Te esperamos el <strong>%s</strong>, a las <strong>%s</strong>, para disfrutar juntos de una experiencia inmersiva única de la que no podrás escapar tan fácilmente. Prepárate para poner a prueba tus habilidades, resolver enigmas y enfrentar desafíos con tu equipo en nuestra sala de escape. ¿Estás listo para vivir la aventura?</p>
+            <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;">
+            <!-- Instagram -->
+            <p>Te invitamos a seguirnos en <strong>Instagram</strong> para enterarte de las novedades, desafíos y sorteos exclusivos:</p>
+            <p style="text-align: center; margin: 20px 0;">
+                <a href="https://www.instagram.com/lockandkey.rosario?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" style="color: #1a73e8; text-decoration: none; font-weight: bold;">Síguenos en Instagram</a>
+            </p>
+            <!-- Cierre -->
+            <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;">
+            <p style="text-align: center; font-weight: bold; margin-top: 20px;">¡Esperamos verte pronto para una nueva aventura!</p>
+            <p style="text-align: center;">El equipo de <strong>Lock and Key</strong></p>
+        </div>
+    </body>
+</html>
+""".formatted(
+                            turno.getId(),  // Número de reserva
+                            turno.getDiaYHora().toLocalDate(),  // Fecha
+                            turno.getDiaYHora().toLocalTime()  // Hora
+                    );
+
                     emailService.sendEmail(turno.getMail(), subject, bodyMessage);
                     logger.info("Correo de confirmación enviado a: {}", turno.getMail());
                 }
@@ -99,9 +136,9 @@ public class MercadoPagoWebhookController {
         }
     }
 
-
     private String extraerPaymentId(String body) {
         try {
+            logger.info("Intentando extraer el Payment ID del cuerpo: {}", body);
             ObjectMapper mapper = new ObjectMapper();
             JsonNode jsonNode = mapper.readTree(body);
             return jsonNode.path("data").path("id").asText(null);
@@ -113,6 +150,7 @@ public class MercadoPagoWebhookController {
 
     private Payment consultarEstadoPago(String paymentId) {
         try {
+            logger.info("Consultando el estado del pago con ID: {}", paymentId);
             PaymentClient paymentClient = new PaymentClient();
             return paymentClient.get(Long.valueOf(paymentId));
         } catch (MPException | MPApiException e) {
