@@ -55,12 +55,14 @@ public class TurnoController {
             return new ResponseEntity<>("El importe pagado debe ser mayor que cero", HttpStatus.BAD_REQUEST);
         }
 
+        System.out.println("LLegue a 1 " );
 
         Optional<Sala> sala = salaRepository.findById(turnoDTO.getSalaId());
         if (sala.isEmpty()) {
             return new ResponseEntity<>("Sala no encontrada", HttpStatus.NOT_FOUND);
         }
 
+        System.out.println("LLegue a 2 " );
         try {
             // Buscar turnos pagados en la misma sala y horario
             List<Turno> turnos = turnoRepository.findPaidTurnosBySalaIdAndDiaYHora(turnoDTO.getSalaId(), turnoDTO.getDiaYHora());
@@ -86,6 +88,7 @@ public class TurnoController {
 
             MercadoPagoConfig.setAccessToken(accessToken);
 
+            System.out.println("LLegue a 3 " );
 
             // Crear un ítem para la preferencia
             PreferenceItemRequest itemRequest = PreferenceItemRequest.builder()
@@ -95,6 +98,7 @@ public class TurnoController {
                     .unitPrice(turnoDTO.getimporteTotal()) // Asegúrate de que sea BigDecimal
                     .build();
 
+            System.out.println("LLegue a 4 " );
 
             // Calcular la fecha y hora de expiración (15 minutos a partir de ahora)
             LocalDateTime expirationDate = LocalDateTime.now(ZoneOffset.UTC).plusMinutes(10);
@@ -119,6 +123,9 @@ public class TurnoController {
                     .build();
 
             PreferenceClient preferenceClient = new PreferenceClient();
+
+            System.out.println("LLegue a 5 " );
+
             try {
                 Preference preference = preferenceClient.create(preferenceRequest);
                 String paymentLink = preference.getInitPoint(); // Usar getInitPoint() para producción
@@ -126,6 +133,8 @@ public class TurnoController {
                 // Guardar el preferenceId en el turno y actualizar en la base de datos
                 savedTurno.setPreferenceId(preference.getId());
                 turnoRepository.save(savedTurno);
+
+                System.out.println("LLegue a 8 " );
 
                 // Enviar correo con el enlace de pago
                 String subject = "Confirmación de Turno - Pago Pendiente";
@@ -194,12 +203,15 @@ public class TurnoController {
                         paymentLink  // Enlace de pago
                 );
 
+                System.out.println("LLegue a 9 " );
+
                 emailService.sendEmail(turnoDTO.getMail(), subject, body);
 
-
+                System.out.println("LLegue a 6 " );
                 // Crear el objeto de respuesta con el turno y el enlace de pago
                 TurnoConLinkDePago response = new TurnoConLinkDePago(savedTurno, paymentLink);
 
+                System.out.println("LLegue a 7" );
                 return new ResponseEntity<>(response, HttpStatus.CREATED);
 
             } catch (MPException | MPApiException e) {
@@ -303,7 +315,7 @@ public class TurnoController {
         return new ResponseEntity<>(updatedTurno, HttpStatus.OK);
     }
 
-    @PatchMapping("/marcarAsistencia")
+    @PutMapping("/marcarAsistencia")
     public ResponseEntity<?> marcarAsistencia(@RequestParam Long id, @RequestParam boolean asistio) {
         // Buscar el turno en la base de datos
         Optional<Turno> turnoOptional = turnoRepository.findById(id);
